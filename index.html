@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Салон красоты</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 16px;
+            color: #1c1c1e;
+        }
+        h1 { font-size: 22px; margin-bottom: 8px; }
+        p { color: #8e8e93; margin-top: 0; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .card:active { background: #e5e5ea; }
+        .card h3 { margin: 0 0 4px 0; font-size: 16px; }
+        .card span { font-size: 14px; color: #007aff; }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>💇‍♀️ Салон «Примерный»</h1>
+    <p>Выберите услугу, чтобы записаться</p>
+
+    <div class="card" onclick="выбратьУслугу('Стрижка')">
+        <h3>✂️ Стрижка</h3>
+        <span>от 1500 ₽</span>
+    </div>
+
+    <div class="card" onclick="выбратьУслугу('Окрашивание')">
+        <h3>🎨 Окрашивание</h3>
+        <span>от 3000 ₽</span>
+    </div>
+
+    <div class="card" onclick="выбратьУслугу('Маникюр')">
+        <h3>💅 Маникюр</h3>
+        <span>от 1200 ₽</span>
+    </div>
+
+    <button onclick="отправитьЗапись()">Подтвердить запись</button>
+
+    <script>
+        let выбраннаяУслуга = null;
+
+        function выбратьУслугу(услуга) {
+            выбраннаяУслуга = услуга;
+            alert('Вы выбрали: ' + услуга);
+        }
+
+        function отправитьЗапись() {
+            if (!выбраннаяУслуга) {
+                alert('Сначала выберите услугу');
+                return;
+            }
+            alert('Запись на ' + выбраннаяУслуга + ' отправлена!');
+            // Здесь позже будет отправка данных в бота
+        }
+    </script>
+</body>
+</html>
