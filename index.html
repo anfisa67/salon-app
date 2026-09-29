@@ -1,81 +1,96 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Салон красоты</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f0f2f5;
-            margin: 0;
-            padding: 16px;
-            color: #1c1c1e;
-        }
-        h1 { font-size: 22px; margin-bottom: 8px; }
-        p { color: #8e8e93; margin-top: 0; }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .card:active { background: #e5e5ea; }
-        .card h3 { margin: 0 0 4px 0; font-size: 16px; }
-        .card span { font-size: 14px; color: #007aff; }
-        button {
-            width: 100%;
-            padding: 14px;
-            background: #007aff;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
-    </style>
-</head>
-<body>
-    <h1>💇‍♀️ Салон «Примерный»</h1>
-    <p>Выберите услугу, чтобы записаться</p>
+<h3>✂️ Стрижка</h3>
+            <span>от 1500 ₽</span>
+        </div>
 
-    <div class="card" onclick="выбратьУслугу('Стрижка')">
-        <h3>✂️ Стрижка</h3>
-        <span>от 1500 ₽</span>
+        <div class="card" onclick="выбратьУслугу(this, 'Окрашивание', 3000)">
+            <h3>🎨 Окрашивание</h3>
+            <span>от 3000 ₽</span>
+        </div>
+
+        <div class="card" onclick="выбратьУслугу(this, 'Маникюр', 1200)">
+            <h3>💅 Маникюр</h3>
+            <span>от 1200 ₽</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="section-title">Контакты</div>
+
+        <a href="tel:+79990000000" class="contact-row">
+            <span class="icon">📞</span>
+            <div>
+                <div class="text">+7 (999) 000-00-00</div>
+                <div class="sub">Позвонить</div>
+            </div>
+        </a>
+
+        <a href="https://t.me/your_username" class="contact-row">
+            <span class="icon">✈️</span>
+            <div>
+                <div class="text">Telegram</div>
+                <div class="sub">Написать нам</div>
+            </div>
+        </a>
+
+        <div class="contact-row">
+            <span class="icon">📍</span>
+            <div>
+                <div class="text">ул. Примерная, д. 1</div>
+                <div class="sub">Работаем: 10:00–20:00</div>
+            </div>
+        </div>
     </div>
 
-    <div class="card" onclick="выбратьУслугу('Окрашивание')">
-        <h3>🎨 Окрашивание</h3>
-        <span>от 3000 ₽</span>
+    <!-- Экран успеха -->
+    <div id="successScreen" class="success">
+        <div class="check">✅</div>
+        <h2>Заявка отправлена!</h2>
+        <p>Мы свяжемся с вами для подтверждения.</p>
     </div>
 
-    <div class="card" onclick="выбратьУслугу('Маникюр')">
-        <h3>💅 Маникюр</h3>
-        <span>от 1200 ₽</span>
+    <!-- Кнопка внизу -->
+    <div class="bottom-btn" id="bottomBtn">
+        <button onclick="отправитьЗапись()">Записаться</button>
     </div>
-
-    <button onclick="отправитьЗапись()">Подтвердить запись</button>
 
     <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
         let выбраннаяУслуга = null;
 
-        function выбратьУслугу(услуга) {
-            выбраннаяУслуга = услуга;
-            alert('Вы выбрали: ' + услуга);
+        function выбратьУслугу(элемент, услуга, цена) {
+            // Снимаем выделение со всех карточек
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+            // Выделяем выбранную
+            элемент.classList.add('selected');
+            выбраннаяУслуга = { название: услуга, цена: цена };
+            tg.HapticFeedback.impactOccurred('light');
         }
 
         function отправитьЗапись() {
             if (!выбраннаяУслуга) {
-                alert('Сначала выберите услугу');
+                tg.showAlert('Пожалуйста, выберите услугу');
                 return;
             }
-            alert('Запись на ' + выбраннаяУслуга + ' отправлена!');
-            // Здесь позже будет отправка данных в бота
+
+            // Отправляем данные боту
+            tg.sendData(JSON.stringify({
+                действие: 'запись',
+                услуга: выбраннаяУслуга.название,
+                цена: выбраннаяУслуга.цена
+            }));
+
+            // Показываем экран успеха
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('bottomBtn').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'block';
+
+            tg.HapticFeedback.notificationOccurred('success');
+
+            // Закрываем окно через 3 секунды
+            setTimeout(() => tg.close(), 3000);
         }
     </script>
 </body>
